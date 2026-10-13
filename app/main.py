@@ -137,7 +137,10 @@ def create_indexes():
         name="ix_attendance_emp_date",
 
     )
-
+    db.employees.create_index(
+    [("joined_on", ASCENDING)],
+    name="ix_employees_joined_on",
+)
     db.attendance_logs.create_index(
 
         [("status", ASCENDING), ("date", DESCENDING), ("emp_code", ASCENDING)],
