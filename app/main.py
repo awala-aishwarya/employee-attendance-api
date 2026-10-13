@@ -1176,7 +1176,7 @@ def employee_monthly(emp_code: str, month: str):
 
     overtime = [x.get("overtime_minutes", 0) for x in logs]
 
-    pct = rounded(present / working_days * 100) if working_days else None
+    pct = rounded(present / working_days * 100, 4) if working_days else None
 
     return {
 
@@ -1284,7 +1284,9 @@ def late_leaderboard(
 
         {"$group": {"_id": "$emp_code",
 
-                    "total_late_minutes": {"$sum": {"$ifNull": ["$late_minutes", 0]}}}},
+                    "total_late_minutes": {"$sum": {"$ifNull": ["$late_minutes", 0]}},
+
+                    "late_count": {"$sum": {"$cond": [{"$gt": [{"$ifNull": ["$late_minutes", 0]}, 0]}, 1, 0]}}}},
 
         {"$match": {"total_late_minutes": {"$gt": 0}}},
 
@@ -1320,7 +1322,7 @@ def late_leaderboard(
 
             "department": "$employee.department", "rank": 1,
 
-            "total_late_minutes": 1,
+            "total_late_minutes": 1, "late_count": 1,
 
         }},
 
