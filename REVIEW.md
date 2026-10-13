@@ -1,0 +1,32 @@
+# REVIEW.md
+
+## Defects Found in the Starter Code
+
+| # | Where (function / line) | What is wrong | How you'd notice it (test, input, or symptom) | How you fixed it |
+|---|---|---|---|---|
+| 1 | `health` endpoint | The health check does not adequately verify database connectivity. | Stop or misconfigure MongoDB and check whether the endpoint still reports the application as healthy. | Added appropriate database connectivity handling to distinguish application health from database availability. |
+| 2 | Employee creation endpoint | Duplicate employee creation is not sufficiently protected against concurrent requests. | Submit requests for the same employee identifier, including concurrent requests, and check whether duplicates can be created. | Added duplicate handling and relied on database uniqueness enforcement where required. |
+| 3 | Employee creation endpoint | Employee creation does not consistently handle timestamp timezone information. | Create an employee and inspect the stored timestamp for consistent timezone handling. | Corrected timestamp handling to use a consistent timezone-aware representation. |
+| 4 | Employee listing endpoint | Filtering, sorting, and pagination can produce inconsistent results or totals if performed in the wrong order. | Request filtered results across multiple pages and compare the reported total with the matching records. | Corrected the query flow so filtering, sorting, pagination, and total counting are handled consistently. |
+| 5 | Punch-in endpoint | Employee validation and attendance-state checks are insufficient. | Attempt to punch in with an unknown employee identifier or when an attendance record already exists for the relevant date. | Added the required validation and attendance-state checks. |
+| 6 | Punch-in endpoint | Attendance creation does not adequately protect against duplicate or concurrent operations. | Send repeated or concurrent punch-in requests for the same employee and date. | Added duplicate handling and appropriate database constraints or atomic operations where required. |
+| 7 | `compute_late_minutes` helper | Time calculations need consistent timezone and shift-boundary handling. | Test arrivals around the expected shift start, including boundary times and timezone-sensitive inputs. | Corrected the time calculation to use consistent timezone and boundary handling. |
+| 8 | `compute_work_hours` helper | Work-hour calculation does not adequately handle overnight shifts or timestamps crossing midnight. | Test a shift that starts before midnight and ends after midnight. | Corrected the elapsed-time calculation to handle overnight attendance correctly. |
+| 9 | `compute_overtime` helper | Overtime calculation needs consistent rounding and correct handling of attendance dates and boundaries. | Test work durations around rounding boundaries and shifts crossing midnight. | Corrected the overtime calculation and applied consistent rounding and date handling. |
+| 10 | Attendance listing endpoint | Fetching records and sorting them in Python is inefficient for larger datasets and can interfere with pagination consistency. | Test with a larger attendance dataset and compare response time and pagination results. | Moved supported filtering, sorting, and pagination operations into MongoDB queries. |
+| 11 | Attendance listing endpoint | Database records require consistent serialization before being returned through the API. | Request attendance records containing MongoDB-specific values and check whether the response conforms to the API schema. | Corrected response serialization to return values in the expected API format. |
+| 12 | MongoDB index configuration | Required indexes were missing or insufficient for important query patterns. | Inspect query execution plans using representative filters and check for unnecessary collection scans. | Added indexes to support employee lookups, attendance date and employee queries, and department analytics. |
+| 13 | Punch-out endpoint | The starter contained an unfinished implementation. | Call the documented punch-out endpoint and verify whether it performs the required attendance update and validations. | Implemented the endpoint according to the API contract and attendance rules. |
+| 14 | Regularization endpoint | The starter contained an unfinished implementation. | Submit valid and invalid regularization requests and check whether the required rules are enforced. | Implemented the endpoint and its applicable validations according to the API contract. |
+| 15 | Department summary analytics endpoint | The starter contained an unfinished implementation. | Request a department summary and verify the returned aggregation against matching employee and attendance records. | Implemented the required aggregation and response handling. |
+| 16 | Late-arrival leaderboard endpoint | The starter contained an unfinished implementation. | Request the leaderboard for a date range and compare the rankings with the underlying attendance records. | Implemented the required filtering, aggregation, and ranking logic. |
+| 17 | Department trend analytics endpoint | The starter contained an unfinished implementation. | Request a department trend over a date range and verify the results against matching records. | Implemented the required date filtering and trend aggregation. |
+| 18 | Admin explain endpoint | The starter contained an unfinished implementation for query-plan inspection. | Request explain information for each supported endpoint and verify that execution-plan details are returned. | Implemented explain-plan support for the documented endpoint types and reviewed the resulting MongoDB plans. |
+
+## Reviewed but Not Considered Defects
+
+1. Empty query results are not necessarily an error. For example, an employee monthly query may return no records when the employee has no attendance records in the requested month.
+2. An `IXSCAN` or `EXPRESS_IXSCAN` execution stage is not a defect by itself. These stages indicate index-based query execution.
+3. A query returning zero matching documents does not automatically indicate a faulty query plan. The input filters and available data must also be checked.
+4. An endpoint returning HTTP 200 does not, by itself, prove that its business logic is correct. The response must also be checked against the API contract and expected results.
+5. Successful execution on the sample dataset does not guarantee performance on the grader's larger dataset. Query plans and index usage should be evaluated with representative data.
