@@ -1,8 +1,8 @@
-# Candidate Kit — Employee Analytics API
+# Employee Analytics API
 
 ## Overview
 
-A FastAPI application backed by MongoDB that provides employee attendance and analytics endpoints, including department summaries, trends, and query execution plan explanations.
+A FastAPI application backed by MongoDB that provides employee management, attendance tracking, and analytics endpoints, including department summaries, attendance trends, late-arrival leaderboards, and query execution plan explanations.
 
 ## Tech Stack
 
@@ -15,49 +15,52 @@ A FastAPI application backed by MongoDB that provides employee attendance and an
 
 ## Setup
 
-1. Create and activate a virtual environment:
+### 1. Create and activate a virtual environment
 
-   ```bash
-   python -m venv .venv
-   ```
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
 
-   Windows PowerShell:
+### 2. Install dependencies
 
-   ```powershell
-   .\.venv\Scripts\Activate.ps1
-   ```
+```powershell
+pip install -r requirements.txt
+```
 
-2. Install dependencies:
+### 3. Configure environment variables
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Create a `.env` file using `.env.example` as a reference. Configure `MONGO_URI` and `MONGO_DB` with your MongoDB connection details.
 
-3. Configure `.env` using `.env.example`. Set `MONGO_URI` and `MONGO_DB`. Never commit credentials.
+Never commit credentials or your `.env` file to version control.
 
-4. Seed the sample database:
+### 4. Seed the sample database
 
-   ```bash
-   python sample_seed.py
-   ```
+Verify that `MONGO_DB` points to the intended database before running the seed script.
 
-5. Start the application:
+```powershell
+python sample_seed.py
+```
 
-   ```bash
-   uvicorn app.main:app --port 8000 --reload
-   ```
+### 5. Start the application
+
+```powershell
+uvicorn app.main:app --port 8000 --reload
+```
 
 ## API Documentation
 
-Once the server is running, open `http://127.0.0.1:8000/docs` to explore and test the API.
+Once the application is running, open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) to explore the available endpoints and send test requests.
+
+The health endpoint is available at `/health`.
 
 ## Query Performance
 
-MongoDB indexes support the application's query patterns. The explain endpoint provides execution-plan details for supported endpoints. Performance should be evaluated against representative datasets.
+MongoDB indexes support the application's query patterns. The explain endpoint provides execution-plan details for supported endpoints. Query performance should be evaluated using representative datasets and execution statistics.
 
 ## Submission
 
-The public Git repository must include:
+The public Git repository should include:
 
 - `app/main.py`
 - `requirements.txt`
@@ -65,4 +68,4 @@ The public Git repository must include:
 - `DECISIONS.md`
 - `README.md`
 
-Do not commit `.env`, secrets, or a Dockerfile.
+Do not commit `.env` files, API keys, passwords, database credentials, virtual environments, or other sensitive information.
